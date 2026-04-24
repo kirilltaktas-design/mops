@@ -7,9 +7,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg-color: #000000; --card-bg: #111113; --accent-blue: #3b82f6; --text-main: #ffffff; --text-gray: #8e8e93; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; user-select: none; }
         
-        /* Верхнее меню (Табы) */
+        /* Навигация */
         .nav-tabs { display: flex; justify-content: space-around; padding: 15px 5px; border-bottom: 1px solid #1c1c1e; position: sticky; top: 0; background: var(--bg-color); z-index: 100; }
         .tab { color: var(--text-gray); font-size: 13px; font-weight: 500; cursor: pointer; padding: 5px 10px; transition: 0.2s; }
         .tab.active { color: var(--accent-blue); border-bottom: 2px solid var(--accent-blue); }
@@ -17,36 +17,26 @@
         .container { padding: 15px; display: none; }
         .container.active { display: block; }
 
-        /* Профиль */
-        .profile-header { text-align: center; background: linear-gradient(180deg, #1c1c1e 0%, #111113 100%); border-radius: 20px; padding: 30px 20px; margin-bottom: 15px; position: relative; }
-        .avatar { width: 80px; height: 80px; background: #3b82f6; border-radius: 50%; margin: 0 auto 15px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-        .status-badge { font-size: 13px; color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); padding: 4px 12px; border-radius: 20px; }
-
-        /* Сетка Профиля */
-        .grid-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .stat-card { background: var(--card-bg); padding: 15px; border-radius: 15px; }
-        .stat-label { color: var(--text-gray); font-size: 11px; text-transform: uppercase; margin-bottom: 5px; }
-        .stat-value { font-size: 18px; font-weight: bold; }
-        .stat-value span { color: var(--accent-blue); }
-
-        /* Инструкции (Помощь) */
+        /* Карточки и блоки */
         .section-title { font-size: 12px; color: var(--text-gray); text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px; }
-        .instr-card { background: var(--card-bg); border-radius: 15px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; text-decoration: none; color: white; }
-        .instr-icon { font-size: 20px; margin-right: 15px; }
-        .instr-info { flex-grow: 1; }
-        .instr-name { font-size: 15px; font-weight: 600; }
-        .instr-sub { font-size: 11px; color: var(--text-gray); }
-        .instr-link { color: var(--text-gray); font-size: 14px; }
+        .card-item { background: var(--card-bg); border-radius: 15px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; text-decoration: none; color: white; transition: 0.2s; }
+        .card-item:active { background: #1c1c1e; }
+        .icon { font-size: 20px; margin-right: 15px; }
+        .info { flex-grow: 1; }
+        .name { font-size: 15px; font-weight: 600; }
+        .sub { font-size: 11px; color: var(--text-gray); }
+        .arrow { color: #444; font-size: 16px; }
+
+        /* Профиль */
+        .profile-header { text-align: center; background: linear-gradient(180deg, #1c1c1e 0%, #111113 100%); border-radius: 20px; padding: 30px 20px; margin-bottom: 15px; }
+        .avatar { width: 70px; height: 70px; background: var(--accent-blue); border-radius: 50%; margin: 0 auto 15px; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
 
         /* Подписка */
-        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .plan-card { background: var(--card-bg); border: 2px solid transparent; padding: 20px 15px; border-radius: 15px; text-align: left; transition: 0.3s; }
-        .plan-card.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.05); }
-        .plan-time { font-size: 17px; font-weight: bold; margin-bottom: 5px; }
-        .plan-desc { font-size: 12px; color: var(--text-gray); }
+        .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .plan-card { background: var(--card-bg); border: 2px solid transparent; padding: 20px 15px; border-radius: 15px; transition: 0.3s; }
+        .plan-card.active { border-color: var(--accent-blue); }
         
         .main-btn { background: var(--accent-blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        .main-btn:active { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -54,95 +44,75 @@
     <div class="nav-tabs">
         <div class="tab active" onclick="showPage('profile', this)">Профиль</div>
         <div class="tab" onclick="showPage('subscribe', this)">Подписка</div>
-        <div class="tab" onclick="showPage('tasks', this)">Задания</div>
         <div class="tab" onclick="showPage('help', this)">Помощь</div>
     </div>
 
     <div id="profile" class="container active">
         <div class="profile-header">
             <div class="avatar"></div>
-            <div class="status-badge">Статус: Нет подписки</div>
+            <div style="font-weight: bold; font-size: 18px;">Пользователь</div>
+            <div style="color: var(--accent-blue); font-size: 13px; margin-top: 5px;">Нет подписки</div>
         </div>
-        
-        <div class="grid-stats">
-            <div class="stat-card">
-                <div class="stat-label">Осталось дней</div>
-                <div class="stat-value">0</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Тариф</div>
-                <div class="stat-value"><span>Стандарт</span></div>
-            </div>
-        </div>
-        
-        <div class="stat-card" style="margin-bottom: 10px;">
-            <div class="stat-label">Использовано трафика</div>
-            <div class="stat-value">0.0 <span style="font-size: 12px; color: var(--text-gray);">/ ∞</span></div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">💰 Реферальный баланс</div>
-            <div class="stat-value">0₽</div>
+        <div class="card-item">
+            <div class="icon">👤</div>
+            <div class="info"><div class="name">Мой ID</div><div class="sub" id="user-id">Не определен</div></div>
         </div>
     </div>
 
     <div id="subscribe" class="container">
-        <h2 style="text-align: center; margin: 10px 0 5px;">Подписка</h2>
-        <p style="text-align: center; color: var(--text-gray); font-size: 13px; margin-bottom: 25px;">Настройте идеальный план</p>
-        
-        <div class="section-title">1. Срок</div>
+        <div class="section-title">Выберите тариф</div>
         <div class="plan-grid">
             <div class="plan-card active" onclick="selectPlan(120, this)">
-                <div class="plan-time">1 Месяц</div>
-                <div class="plan-desc">∞ Безлимит</div>
+                <div style="font-weight:bold">1 Месяц</div>
+                <div style="font-size:12px; color:var(--text-gray)">120 ₽</div>
             </div>
             <div class="plan-card" onclick="selectPlan(320, this)">
-                <div class="plan-time">3 Месяца</div>
-                <div class="plan-desc">∞ Безлимит</div>
+                <div style="font-weight:bold">3 Месяца</div>
+                <div style="font-size:12px; color:var(--text-gray)">320 ₽</div>
             </div>
             <div class="plan-card" onclick="selectPlan(600, this)">
-                <div class="plan-time">6 Месяцев</div>
-                <div class="plan-desc">∞ Безлимит</div>
+                <div style="font-weight:bold">6 Месяцев</div>
+                <div style="font-size:12px; color:var(--text-gray)">600 ₽</div>
             </div>
             <div class="plan-card" onclick="selectPlan(1000, this)">
-                <div class="plan-time">1 Год</div>
-                <div class="plan-desc">∞ Безлимит</div>
+                <div style="font-weight:bold">1 Год</div>
+                <div style="font-size:12px; color:var(--text-gray)">1000 ₽</div>
             </div>
         </div>
-
         <button class="main-btn" id="payBtn" onclick="sendPay()">ОФОРМИТЬ ЗА 120 ₽</button>
     </div>
 
     <div id="help" class="container">
-        <h2 style="text-align: center;">Инструкции</h2>
         
         <div class="section-title">Приложения</div>
-        <a href="https://apps.apple.com/app/v2box-vless-vmess/id1640412850" target="_blank" class="instr-card">
-            <div class="instr-icon">🍎</div>
-            <div class="instr-info">
-                <div class="instr-name">iOS / macOS</div>
-                <div class="instr-sub">V2Box</div>
-            </div>
-            <div class="instr-link">↗</div>
+        <a href="https://apps.apple.com/app/v2box-vless-vmess/id1640412850" target="_blank" class="card-item">
+            <div class="icon">🍎</div>
+            <div class="info"><div class="name">iOS / macOS</div><div class="sub">V2Box</div></div>
+            <div class="arrow">➜</div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang" target="_blank" class="card-item">
+            <div class="icon">🤖</div>
+            <div class="info"><div class="name">Android</div><div class="sub">v2rayNG</div></div>
+            <div class="arrow">➜</div>
         </a>
 
-        <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang" target="_blank" class="instr-card">
-            <div class="instr-icon">🤖</div>
-            <div class="instr-info">
-                <div class="instr-name">Android</div>
-                <div class="instr-sub">v2rayNG</div>
-            </div>
-            <div class="instr-link">↗</div>
+        <div class="section-title">Юридическая информация</div>
+        <a href="#" class="card-item">
+            <div class="icon">📄</div>
+            <div class="info"><div class="name">Пользовательское соглашение</div><div class="sub">Условия использования сервиса</div></div>
+            <div class="arrow">➜</div>
+        </a>
+        <a href="#" class="card-item">
+            <div class="icon">🛡️</div>
+            <div class="info"><div class="name">Политика конфиденциальности</div><div class="sub">Обработка ваших данных</div></div>
+            <div class="arrow">➜</div>
         </a>
 
-        <div class="section-title">Остались вопросы?</div>
-        <a href="https://t.me/MopsVpnHelp" target="_blank" class="instr-card">
-            <div class="instr-icon">🎧</div>
-            <div class="instr-info">
-                <div class="instr-name">Служба поддержки</div>
-                <div class="instr-sub">@MopsVpnHelp</div>
-            </div>
-            <div class="instr-link">↗</div>
+        <div class="section-title">Поддержка</div>
+        <a href="https://t.me/MopsVpnHelp" target="_blank" class="card-item" style="border: 1px solid var(--accent-blue);">
+            <div class="icon">🎧</div>
+            <div class="info"><div class="name">Связаться с поддержкой</div><div class="sub">@MopsVpnHelp</div></div>
+            <div class="arrow">➜</div>
         </a>
     </div>
 
@@ -150,6 +120,8 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         let currentPrice = 120;
+
+        document.getElementById('user-id').innerText = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "ID не найден";
 
         function showPage(pageId, el) {
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
