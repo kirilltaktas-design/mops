@@ -7,27 +7,39 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg-color: #000000; --card-bg: #111113; --accent-blue: #3b82f6; --text-main: #ffffff; --text-gray: #8e8e93; }
-        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; user-select: none; overflow-x: hidden; }
         
+        /* Табы навигации */
         .nav-tabs { display: flex; justify-content: space-around; padding: 15px 5px; border-bottom: 1px solid #1c1c1e; position: sticky; top: 0; background: var(--bg-color); z-index: 100; }
-        .tab { color: var(--text-gray); font-size: 13px; font-weight: 500; cursor: pointer; padding: 5px 10px; }
+        .tab { color: var(--text-gray); font-size: 13px; font-weight: 500; cursor: pointer; padding: 8px 12px; transition: 0.2s; }
         .tab.active { color: var(--accent-blue); border-bottom: 2px solid var(--accent-blue); }
 
         .container { padding: 15px; display: none; }
         .container.active { display: block; }
 
-        .section-title { font-size: 12px; color: var(--text-gray); text-transform: uppercase; margin: 20px 0 10px 5px; }
-        .card-item { background: var(--card-bg); border-radius: 15px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; text-decoration: none; color: white; }
-        .icon { font-size: 20px; margin-right: 15px; }
+        /* Элементы списка/карточки */
+        .section-title { font-size: 12px; color: var(--text-gray); text-transform: uppercase; margin: 20px 0 10px 5px; letter-spacing: 1px; }
+        .card-item { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; text-decoration: none; color: white; transition: background 0.2s; }
+        .card-item:active { background: #1c1c1e; }
+        .icon { font-size: 22px; margin-right: 15px; width: 24px; text-align: center; }
         .info { flex-grow: 1; }
-        .name { font-size: 15px; font-weight: 600; }
+        .name { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
         .sub { font-size: 11px; color: var(--text-gray); }
+        .arrow { color: #3a3a3c; font-size: 16px; margin-left: 10px; }
 
+        /* Профиль */
+        .profile-card { text-align: center; background: linear-gradient(180deg, #1c1c1e 0%, #111113 100%); border-radius: 24px; padding: 30px 20px; margin-bottom: 15px; }
+        .avatar { width: 72px; height: 72px; background: var(--accent-blue); border-radius: 50%; margin: 0 auto 15px; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+
+        /* Сетка тарифов */
         .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .plan-card { background: var(--card-bg); border: 2px solid transparent; padding: 20px 15px; border-radius: 15px; }
-        .plan-card.active { border-color: var(--accent-blue); }
+        .plan-card { background: var(--card-bg); border: 2px solid transparent; padding: 20px 15px; border-radius: 16px; transition: 0.3s; }
+        .plan-card.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.05); }
+        .plan-title { font-weight: bold; font-size: 16px; }
+        .plan-price { font-size: 13px; color: var(--text-gray); margin-top: 4px; }
         
-        .main-btn { background: var(--accent-blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: bold; margin-top: 20px; }
+        .main-btn { background: var(--accent-blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 16px; font-size: 16px; font-weight: bold; margin-top: 24px; cursor: pointer; }
+        .main-btn:active { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -39,64 +51,100 @@
     </div>
 
     <div id="profile" class="container active">
-        <div style="text-align: center; padding: 30px;">
-            <div style="width: 70px; height: 70px; background: var(--accent-blue); border-radius: 50%; margin: 0 auto 15px;"></div>
-            <div style="font-weight: bold; font-size: 18px;">Пользователь</div>
-            <div style="color: var(--accent-blue); font-size: 13px;">Статус: Нет подписки</div>
+        <div class="profile-card">
+            <div class="avatar"></div>
+            <div style="font-weight: bold; font-size: 19px;">Личный кабинет</div>
+            <div style="color: var(--accent-blue); font-size: 13px; margin-top: 6px; font-weight: 500;">Статус: Нет подписки</div>
         </div>
+        
         <div class="card-item">
-            <div class="icon">👤</div>
-            <div class="info"><div class="name">Мой ID</div><div class="sub" id="u-id">Загрузка...</div></div>
+            <div class="icon">🆔</div>
+            <div class="info"><div class="name">Ваш ID</div><div class="sub" id="user-id">Загрузка...</div></div>
         </div>
     </div>
 
     <div id="subscribe" class="container">
-        <div class="section-title">Тарифы</div>
+        <div class="section-title">Выбор периода</div>
         <div class="plan-grid">
-            <div class="plan-card active" onclick="sel(120, this)"><b>1 Месяц</b><br><small>120 ₽</small></div>
-            <div class="plan-card" onclick="sel(320, this)"><b>3 Месяца</b><br><small>320 ₽</small></div>
-            <div class="plan-card" onclick="sel(600, this)"><b>6 Месяцев</b><br><small>600 ₽</small></div>
-            <div class="plan-card" onclick="sel(1000, this)"><b>1 Год</b><br><small>1000 ₽</small></div>
+            <div class="plan-card active" onclick="selectPlan(120, this)">
+                <div class="plan-title">1 Месяц</div>
+                <div class="plan-price">120 ₽</div>
+            </div>
+            <div class="plan-card" onclick="selectPlan(320, this)">
+                <div class="plan-title">3 Месяца</div>
+                <div class="plan-price">320 ₽</div>
+            </div>
+            <div class="plan-card" onclick="selectPlan(600, this)">
+                <div class="plan-title">6 Месяцев</div>
+                <div class="plan-price">600 ₽</div>
+            </div>
+            <div class="plan-card" onclick="selectPlan(1000, this)">
+                <div class="plan-title">1 Год</div>
+                <div class="plan-price">1000 ₽</div>
+            </div>
         </div>
-        <button class="main-btn" id="pBtn" onclick="pay()">ОФОРМИТЬ ЗА 120 ₽</button>
+        <button class="main-btn" id="payBtn" onclick="sendPay()">ОФОРМИТЬ ЗА 120 ₽</button>
     </div>
 
     <div id="help" class="container">
+        <div class="section-title">Инструкции (Приложения)</div>
+        <a href="https://apps.apple.com/app/v2box-vless-vmess/id1640412850" target="_blank" class="card-item">
+            <div class="icon">🍏</div>
+            <div class="info"><div class="name">iOS / macOS</div><div class="sub">Скачать V2Box в App Store</div></div>
+            <div class="arrow">➜</div>
+        </a>
+        <a href="https://play.google.com/store/apps/details?id=com.v2ray.ang" target="_blank" class="card-item">
+            <div class="icon">🤖</div>
+            <div class="info"><div class="name">Android</div><div class="sub">Скачать v2rayNG в Google Play</div></div>
+            <div class="arrow">➜</div>
+        </a>
+
         <div class="section-title">Юридическая информация</div>
-        <a href="https://telegra.ph/User-Agreement-MOPS-04-24" class="card-item">
+        <a href="https://telegra.ph/User-Agreement-MOPS-04-24" target="_blank" class="card-item">
             <div class="icon">📄</div>
-            <div class="info"><div class="name">Соглашение</div><div class="sub">Правила сервиса</div></div>
+            <div class="info"><div class="name">Пользовательское соглашение</div><div class="sub">Условия использования MOPS VPN</div></div>
+            <div class="arrow">➜</div>
         </a>
-        <a href="https://telegra.ph/Privacy-Policy-MOPS-04-24" class="card-item">
+        <a href="https://telegra.ph/Privacy-Policy-MOPS-04-24" target="_blank" class="card-item">
             <div class="icon">🛡️</div>
-            <div class="info"><div class="name">Приватность</div><div class="sub">Ваши данные</div></div>
+            <div class="info"><div class="name">Политика конфиденциальности</div><div class="sub">Защита ваших данных</div></div>
+            <div class="arrow">➜</div>
         </a>
-        <div class="section-title">Поддержка</div>
-        <a href="https://t.me/MopsVpnHelp" class="card-item" style="border: 1px solid var(--accent-blue);">
+
+        <div class="section-title">Обратная связь</div>
+        <a href="https://t.me/MopsVpnHelp" target="_blank" class="card-item" style="border: 1px solid rgba(59, 130, 246, 0.3);">
             <div class="icon">🎧</div>
-            <div class="info"><div class="name">Поддержка</div><div class="sub">@MopsVpnHelp</div></div>
+            <div class="info"><div class="name">Служба поддержки</div><div class="sub">Написать в @MopsVpnHelp</div></div>
+            <div class="arrow">➜</div>
         </a>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        let pr = 120;
-        document.getElementById('u-id').innerText = tg.initDataUnsafe.user?.id || "Не определен";
+        let currentPrice = 120;
 
-        function showPage(p, el) {
+        // Автоматически подставляем ID юзера
+        document.getElementById('user-id').innerText = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : "Не определен";
+
+        function showPage(pageId, el) {
             document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById(p).classList.add('active');
+            document.getElementById(pageId).classList.add('active');
             el.classList.add('active');
         }
-        function sel(p, el) {
-            pr = p;
+
+        function selectPlan(price, el) {
+            currentPrice = price;
             document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('pBtn').innerText = `ОФОРМИТЬ ЗА ${p} ₽`;
+            document.getElementById('payBtn').innerText = `ОФОРМИТЬ ЗА ${price} ₽`;
         }
-        function pay() { tg.sendData(`buy_vpn_${pr}`); tg.close(); }
+
+        function sendPay() {
+            tg.sendData(`buy_vpn_${currentPrice}`);
+            tg.close();
+        }
     </script>
 </body>
 </html>
